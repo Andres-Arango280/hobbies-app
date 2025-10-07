@@ -22,7 +22,7 @@
 
 <main>
   <!-- Hero Section -->
-  <section id="hero">
+  <section id="hero" style="background-image: url(img/bacgraund.png);">
     <div class="hero-content">
       <h2>Conecta con personas que comparten tus pasiones</h2>
       <p>Descubre comunidades, eventos y publicaciones de tus hobbies favoritos.</p>
@@ -30,51 +30,71 @@
     </div>
   </section>
 
-  <!-- Hobbies destacados -->
-  <section id="featured-hobbies">
+    <!-- Hobbies destacados -->
+  <section id="featured-hobbies" style="text-align: center;">
     <h3>Explora Hobbies Populares</h3>
     <div class="hobby-grid">
       <div class="hobby-card">
-        <img src="https://source.unsplash.com/300x200/?painting" alt="Pintura">
+        <img src="img/pintura.png" alt="Pintura">
         <h4>Pintura</h4>
         <p>Conecta con artistas y comparte tus obras.</p>
       </div>
       <div class="hobby-card">
-        <img src="https://source.unsplash.com/300x200/?music" alt="Música">
+        <img src="img/musica.png" alt="Música">
         <h4>Música</h4>
         <p>Descubre bandas, comparte playlists y más.</p>
       </div>
       <div class="hobby-card">
-        <img src="https://source.unsplash.com/300x200/?gaming" alt="Videojuegos">
+        <img src="img/videogmaert.png" alt="Videojuegos">
         <h4>Videojuegos</h4>
         <p>Encuentra compañeros para tus partidas online.</p>
       </div>
       <div class="hobby-card">
-        <img src="https://source.unsplash.com/300x200/?cooking" alt="Cocina">
+        <img src="img/cocina.png" alt="Cocina">
         <h4>Cocina</h4>
         <p>Comparte recetas y trucos culinarios.</p>
       </div>
     </div>
   </section>
 
-  <!-- Publicaciones recientes -->
-  <section id="recent-posts">
-    <h3>📢 Publicaciones Recientes</h3>
-    <div id="posts" class="posts-grid">
-      <!-- Aquí tu JS añadirá posts dinámicos -->
+  <!-- info de nosotros o algo asi o parecido -->
+
+  <section id="recent-posts" style="display: flex; align-items: center; gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+    <div style="flex: 1;">
+      <h2>Que buscamos</h2>
+      <p style="text-align: left;">¡Bienvenido a nuestro espacio digital, donde la pasión se convierte en comunidad! 🎯 Esta página web nace con el propósito de reunir a personas que comparten el mismo hobby, creando un punto de encuentro para intercambiar ideas, experiencias, consejos y momentos inolvidables. Aquí no importa si eres principiante o experto: lo que nos une es el entusiasmo por lo que amamos. Únete, conecta y descubre que tu afición puede abrirte las puertas a nuevas amistades, proyectos y aventuras.</p>
+    </div>
+    <div style="flex: 1; display: flex; justify-content: center;">
+      <img src="img/text.png" alt="Comunidad" style="width: 100%; max-width: 320px; border-radius: 10px;">
     </div>
   </section>
 
+  <!-- Publicaciones recientes -->
+  <section id="recent-posts" style="text-align: center;">
+    <h2>📢 Proximos Eventos</h2>
+  
+  </section>
+
   <!-- Eventos -->
-  <section id="upcoming-events">
+  <section id="upcoming-events" 
+          style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 40px;">
     <h3>🎉 Próximos Eventos</h3>
-    <ul class="event-list">
+    <ul class="event-list" 
+        style="list-style: none; padding: 0; text-align: center; margin: 20px 0;">
       <li><strong>Taller de Fotografía</strong> - 20 Sept 2025</li>
       <li><strong>Maratón de Gaming</strong> - 25 Sept 2025</li>
       <li><strong>Concurso de Cocina</strong> - 30 Sept 2025</li>
-    </ul>
-    <a href="/events.html" class="btn-secondary">Ver todos los eventos</a>
+    </ul> 
+    <a href="/events.html" 
+      class="btn-secondary" 
+      style="text-decoration: none; color: white; background-color: #007BFF; padding: 10px 20px; border-radius: 8px;">
+      Ver todos los eventos
+    </a>
   </section>
+
+
+
+
 </main>
 
 <footer>
