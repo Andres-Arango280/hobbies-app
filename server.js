@@ -35,8 +35,16 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 día
 }));
 
+
+
 // Static
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Redirigir la raíz "/" al login
+app.get('/', (req, res) => {
+  res.redirect('/login.html');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Multer setup (para imágenes/videos)

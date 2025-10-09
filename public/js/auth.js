@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (res.ok) {
           alert("✅ Bienvenido " + result.user.username);
           localStorage.setItem("user", JSON.stringify(result.user));
-          window.location.href = "/"; // redirige al inicio
+          window.location.href = '/index.html'; // redirige al inicio
         } else {
           alert("❌ " + (result.error || "Credenciales inválidas"));
         }

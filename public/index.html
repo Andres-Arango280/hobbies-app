@@ -12,11 +12,10 @@
     <h1>🎨 Hobbies Hub</h1>
   </div>
   <nav>
-    <a href="/">Inicio</a>
+    <a href="/index.html">Inicio</a>
     <a href="/events.html">Eventos</a>
     <a href="/posts.html">Posts</a>
-    <a href="/login.html">Ingresar</a>
-    <a href="/register.html" class="btn-nav">Registro</a>
+    <a href="/login.html">Salir</a>
   </nav>
 </header>
 
@@ -30,38 +29,21 @@
     </div>
   </section>
 
-    <!-- Hobbies destacados -->
+  <!-- Hobbies destacados -->
   <section id="featured-hobbies" style="text-align: center;">
     <h3>Explora Hobbies Populares</h3>
     <div class="hobby-grid">
-      <div class="hobby-card">
-        <img src="img/pintura.png" alt="Pintura">
-        <h4>Pintura</h4>
-        <p>Conecta con artistas y comparte tus obras.</p>
-      </div>
-      <div class="hobby-card">
-        <img src="img/musica.png" alt="Música">
-        <h4>Música</h4>
-        <p>Descubre bandas, comparte playlists y más.</p>
-      </div>
-      <div class="hobby-card">
-        <img src="img/videogmaert.png" alt="Videojuegos">
-        <h4>Videojuegos</h4>
-        <p>Encuentra compañeros para tus partidas online.</p>
-      </div>
-      <div class="hobby-card">
-        <img src="img/cocina.png" alt="Cocina">
-        <h4>Cocina</h4>
-        <p>Comparte recetas y trucos culinarios.</p>
-      </div>
+      <div class="hobby-card"><img src="img/pintura.png" alt="Pintura"><h4>Pintura</h4><p>Conecta con artistas y comparte tus obras.</p></div>
+      <div class="hobby-card"><img src="img/musica.png" alt="Música"><h4>Música</h4><p>Descubre bandas, comparte playlists y más.</p></div>
+      <div class="hobby-card"><img src="img/videogmaert.png" alt="Videojuegos"><h4>Videojuegos</h4><p>Encuentra compañeros para tus partidas online.</p></div>
+      <div class="hobby-card"><img src="img/cocina.png" alt="Cocina"><h4>Cocina</h4><p>Comparte recetas y trucos culinarios.</p></div>
     </div>
   </section>
 
-  <!-- info de nosotros o algo asi o parecido -->
-
-  <section id="recent-posts" style="display: flex; align-items: center; gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+  <!-- Sección informativa -->
+  <section style="display: flex; align-items: center; gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
     <div style="flex: 1;">
-      <h2>Que buscamos</h2>
+      <h2>Qué buscamos</h2>
       <p style="text-align: left;">¡Bienvenido a nuestro espacio digital, donde la pasión se convierte en comunidad! 🎯 Esta página web nace con el propósito de reunir a personas que comparten el mismo hobby, creando un punto de encuentro para intercambiar ideas, experiencias, consejos y momentos inolvidables. Aquí no importa si eres principiante o experto: lo que nos une es el entusiasmo por lo que amamos. Únete, conecta y descubre que tu afición puede abrirte las puertas a nuevas amistades, proyectos y aventuras.</p>
     </div>
     <div style="flex: 1; display: flex; justify-content: center;">
@@ -69,32 +51,14 @@
     </div>
   </section>
 
-  <!-- Publicaciones recientes -->
-  <section id="recent-posts" style="text-align: center;">
-    <h2>📢 Proximos Eventos</h2>
-  
-  </section>
-
-  <!-- Eventos -->
-  <section id="upcoming-events" 
-          style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 40px;">
+  <!-- Próximos Eventos -->
+  <section id="upcoming-events" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 40px;">
     <h3>🎉 Próximos Eventos</h3>
-    <ul class="event-list" 
-        style="list-style: none; padding: 0; text-align: center; margin: 20px 0;">
-      <li><strong>Taller de Fotografía</strong> - 20 Sept 2025</li>
-      <li><strong>Maratón de Gaming</strong> - 25 Sept 2025</li>
-      <li><strong>Concurso de Cocina</strong> - 30 Sept 2025</li>
-    </ul> 
-    <a href="/events.html" 
-      class="btn-secondary" 
-      style="text-decoration: none; color: white; background-color: #007BFF; padding: 10px 20px; border-radius: 8px;">
-      Ver todos los eventos
-    </a>
+    <ul id="eventsList" class="event-list" style="list-style: none; padding: 0; text-align: center; margin: 20px 0;">
+      <li>🔄 Cargando eventos...</li>
+    </ul>
+    <a href="/events.html" class="btn-secondary" style="text-decoration: none; color: white; background-color: #007BFF; padding: 10px 20px; border-radius: 8px;">Ver todos los eventos</a>
   </section>
-
-
-
-
 </main>
 
 <footer>
@@ -106,6 +70,87 @@
   </nav>
 </footer>
 
-<script src="/js/main.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const eventList = document.getElementById("eventsList");
+  if (!eventList) return console.error("❌ No se encontró el elemento #eventsList");
+
+  try {
+    const res = await fetch("/api/events");
+    if (!res.ok) throw new Error("Error al obtener los eventos");
+    const events = await res.json();
+
+    if (events.length === 0) {
+      eventList.innerHTML = `
+        <div style="text-align:center; padding:20px; color:#777;">
+          <h4>📅 No hay eventos próximos 😢</h4>
+          <p>¡Crea uno nuevo en la sección de <a href='/events.html' style='color:#667eea; text-decoration:none;'>eventos</a>!</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Mostrar los eventos más recientes primero
+    const upcoming = events.reverse();
+
+    // 💎 Estilo del contenedor de eventos
+    eventList.style.display = "grid";
+    eventList.style.gridTemplateColumns = "repeat(3, 1fr)"; // ✅ 3 por fila
+    eventList.style.gap = "25px";
+    eventList.style.justifyContent = "center";
+    eventList.style.padding = "20px";
+    eventList.style.listStyle = "none";
+    eventList.style.maxWidth = "1200px";
+    eventList.style.margin = "0 auto";
+
+    // Renderizar tarjetas
+    eventList.innerHTML = upcoming.map(ev => {
+      const date = new Date(ev.date + 'T' + ev.time);
+      const dateStr = isNaN(date.getTime()) ? ev.date : date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      const timeStr = isNaN(date.getTime()) ? ev.time : date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+      return `
+        <li style="
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          padding: 20px;
+          transition: all 0.3s ease;
+          border: 1px solid rgba(102,126,234,0.15);
+          text-align: left;
+        "
+        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(102,126,234,0.25)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'"
+        >
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <span style="font-size:1.4em;">🎉</span>
+            <h4 style="margin:0; font-size:1.2em; color:#667eea;">${ev.title}</h4>
+          </div>
+
+          <p style="margin:8px 0; color:#555;">
+            ${ev.description ? ev.description : "Sin descripción disponible."}
+          </p>
+
+          <div style="margin-top:10px; font-size:0.9em; color:#666;">
+            <p style="margin:4px 0;">📅 <strong>${dateStr}</strong></p>
+            <p style="margin:4px 0;">⏰ ${timeStr}</p>
+            <p style="margin:4px 0;">📍 ${ev.place}</p>
+          </div>
+        </li>
+      `;
+    }).join("");
+
+  } catch (err) {
+    console.error("❌ Error cargando eventos:", err);
+    eventList.innerHTML = `
+      <div style="color:#b00; background:#ffe6e6; padding:15px; border-radius:10px;">
+        ⚠️ Error al cargar los eventos. Intenta más tarde.
+      </div>
+    `;
+  }
+});
+</script>
+
+
 </body>
 </html>
