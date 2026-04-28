@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicaciones - Hobbies Hub</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #667eea;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    input[type="text"], textarea, input[type="file"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #556cd6;
+    }
+    #postsList {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>📝 Publicaciones</h1>
+    <nav>
+      <a href="/index.html" style="color:white; text-decoration:none;">Inicio</a> |
+      <a href="/events.html" style="color:white; text-decoration:none;">Eventos</a> |
+      <a href="/perfil" style="color:white; text-decoration:none;">Perfil</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Crear nueva publicación</h2>
+    <form id="createPost" enctype="multipart/form-data">
+      <input type="text" name="caption" placeholder="Escribe algo interesante..." required>
+      <input type="file" name="media" accept="image/*,video/*">
+      <button type="submit">Publicar</button>
+    </form>
+
+    <h2>📢 Publicaciones recientes</h2>
+    <div id="postsList">Cargando publicaciones...</div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const form = document.getElementById("createPost");
+      const postsList = document.getElementById("postsList");
+
+      // ✅ NO usamos localStorage ni token. Confiamos en la sesión del servidor.
+
+      async function toggleLike(postId, likeBtn, likeCount) {
+        try {
+          const res = await fetch(`/api/posts/${postId}/like`, {
+            method: 'POST',
+            credentials: 'include' // 👈 Envía cookies de sesión
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            likeCount.textContent = data.likesCount;
+            likeBtn.textContent = data.liked ? '❤️' : '🤍';
+            likeBtn.style.color = data.liked ? '#e74c3c' : '#999';
+          } else {
+            const error = await res.json();
+            alert("❌ " + (error.error || "No se pudo registrar el like"));
+          }
+        } catch (err) {
+          console.error("Error al dar like:", err);
+          alert("⚠️ Error de conexión");
+        }
+      }
+
+      async function addComment(postId, texto, commentsContainer, input) {
+        if (!texto.trim()) {
+          alert("⚠️ El comentario no puede estar vacío");
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/posts/${postId}/comment`, {
+            method: 'POST',
+            credentials: 'include', // 👈 Envía cookies
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            displayComments(data.comentarios, commentsContainer);
+            input.value = '';
+          } else {
+            const error = await res.json();
+            alert("❌ " + (error.error || "Error al comentar"));
+          }
+        } catch (err) {
+          console.error("Error al comentar:", err);
+          alert("⚠️ Error de conexión");
+        }
+      }
+
+      function displayComments(comentarios, container) {
+        container.innerHTML = "";
+        if (!comentarios || comentarios.length === 0) {
+          container.innerHTML = "<p style='color: #999;'>No hay comentarios aún</p>";
+          return;
+        }
+
+        comentarios.forEach(comment => {
+          const div = document.createElement("div");
+          div.style.cssText = "background:#f9f9f9;padding:8px;margin:5px 0;border-radius:6px;";
+          div.innerHTML = `
+            <strong>${comment.usuario?.username || "Anon"}:</strong>
+            <p style='margin:5px 0;'>${comment.texto}</p>
+            <small style='color:#777;'>${new Date(comment.fecha).toLocaleString()}</small>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      async function loadPosts() {
+        try {
+          const res = await fetch("/api/posts", {
+            credentials: 'include' // Aunque no es estrictamente necesario para GET público, es bueno incluirlo
+          });
+          if (!res.ok) throw new Error("No se pudieron cargar las publicaciones");
+
+          const data = await res.json();
+          postsList.innerHTML = "";
+
+          if (!data.length) {
+            postsList.innerHTML = "<p>No hay publicaciones aún</p>";
+            return;
+          }
+
+          // Obtenemos el ID del usuario logueado desde el perfil (opcional, para UI)
+          let currentUserId = null;
+          try {
+            const profileRes = await fetch("/api/perfil", { credentials: 'include' });
+            if (profileRes.ok) {
+              const profile = await profileRes.json();
+              currentUserId = profile._id;
+            }
+          } catch (e) {
+            // Usuario no logueado → currentUserId sigue siendo null
+          }
+
+          data.forEach(post => {
+            const div = document.createElement("div");
+            div.className = "post";
+            div.style.cssText = "border:1px solid #ddd;padding:15px;border-radius:8px;background:white;";
+
+            div.innerHTML = `
+              <h4>${post.createdBy?.username || "Usuario desconocido"}</h4>
+              <p>${post.caption}</p>
+              ${post.media ? `<img src="${post.media}" style="max-width:100%;border-radius:8px;">` : ""}
+            `;
+
+            // Likes
+            const likesDiv = document.createElement("div");
+            likesDiv.style.cssText = "margin-top:10px;display:flex;align-items:center;gap:10px;";
+            const likeBtn = document.createElement("button");
+            const isLiked = post.likes?.some(id => id === currentUserId);
+            likeBtn.textContent = isLiked ? "❤️" : "🤍";
+            likeBtn.style.cssText = "border:none;background:none;font-size:1.5rem;cursor:pointer;";
+            const likeCount = document.createElement("span");
+            likeCount.textContent = post.likes?.length || 0;
+            likeBtn.onclick = () => toggleLike(post._id, likeBtn, likeCount);
+            likesDiv.appendChild(likeBtn);
+            likesDiv.appendChild(likeCount);
+            div.appendChild(likesDiv);
+
+            // Comentarios
+            const commentsDiv = document.createElement("div");
+            commentsDiv.style.cssText = "margin-top:10px;";
+            const commentsContainer = document.createElement("div");
+            displayComments(post.comentarios, commentsContainer);
+
+            const input = document.createElement("input");
+            input.placeholder = "Escribe un comentario...";
+            input.style.cssText = "width:70%;padding:5px;margin-top:10px;";
+            const btn = document.createElement("button");
+            btn.textContent = "Enviar";
+            btn.onclick = () => addComment(post._id, input.value, commentsContainer, input);
+
+            commentsDiv.appendChild(commentsContainer);
+            commentsDiv.appendChild(input);
+            commentsDiv.appendChild(btn);
+            div.appendChild(commentsDiv);
+
+            postsList.appendChild(div);
+          });
+        } catch (err) {
+          postsList.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+        }
+      }
+
+      await loadPosts();
+
+      if (form) {
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(form);
+
+          try {
+            const res = await fetch("/api/posts", {
+              method: "POST",
+              credentials: 'include', // 👈 Crucial para sesiones
+              body: formData // No se necesita header Content-Type con FormData
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+              alert("✅ Publicación creada");
+              form.reset();
+              await loadPosts();
+            } else {
+              alert("❌ Error: " + (result.error || "No se pudo crear"));
+            }
+          } catch (err) {
+            alert("⚠️ Error de conexión con el servidor");
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
