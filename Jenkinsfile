@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'   // si tienes configurado NodeJS en Jenkins
+        nodejs 'NodeJS'
     }
 
     stages {
@@ -22,7 +22,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat 'sonar-scanner'
+                    withEnv(["PATH+SONAR=C:\\sonar-scanner\\bin"]) {
+                        bat 'sonar-scanner'
+                    }
                 }
             }
         }
