@@ -23,7 +23,9 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     withEnv(["PATH+SONAR=C:\\sonar-scanner\\bin"]) {
-                        bat 'sonar-scanner'
+                        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                            bat 'sonar-scanner -Dsonar.token=%SONAR_TOKEN% -Dsonar.projectKey=hobbies-app -Dsonar.sources=. -Dsonar.exclusions=node_modules/**,tests/**'
+                        }
                     }
                 }
             }
