@@ -13,23 +13,41 @@ pipeline {
             }
         }
 
-        stage('Run Tests with Coverage') {
+        stage('Run Tests') {
             steps {
                 bat 'npm run test'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Build Docker Image') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    withEnv(["PATH+SONAR=C:\\sonar-scanner\\bin"]) {
-                        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                            bat 'sonar-scanner -Dsonar.token=%SONAR_TOKEN%'
-                        }
-                    }
+                bat 'docker build -t hobbies-app .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    bat '''
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    docker tag hobbies-app %DOCKER_USER%/hobbies-app:latest
+                    docker push %DOCKER_USER%/hobbies-app:latest
+                    '''
                 }
             }
         }
 
+        stage('Deploy Container') {
+            steps {
+                bat 'docker stop hobbies || exit 0'
+                bat 'docker rm hobbies || exit 0'
+                bat 'docker run -d --name hobbies -p 3000:3000 %DOCKER_USER%/hobbies-app:latest'
+            }
+        }
     }
 }

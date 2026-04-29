@@ -23,12 +23,9 @@ const Event = require('./models/Event');
 // ----------------------
 // CONEXIÓN MONGO
 // ----------------------
-mongoose.connect(process.env.MONGO_URI, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
-})
-.then(() => console.log('✅ MongoDB conectado'))
-.catch(err => console.error('❌ Error al conectar con MongoDB:', err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Conectado a MongoDB"))
+  .catch(err => console.error("❌ Error al conectar con MongoDB:", err));
 
 // ----------------------
 // MIDDLEWARES
