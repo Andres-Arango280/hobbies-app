@@ -21,7 +21,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t hobbies-app .'
+                withEnv(["DOCKER_BUILDKIT=0"]) {
+                    bat 'docker build -t hobbies-app .'
+                }
             }
         }
 
@@ -32,7 +34,6 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
                     bat '''
                     docker login -u %DOCKER_USER% -p %DOCKER_PASS%
                     docker tag hobbies-app %DOCKER_USER%/hobbies-app:latest
@@ -46,7 +47,13 @@ pipeline {
             steps {
                 bat 'docker stop hobbies || exit 0'
                 bat 'docker rm hobbies || exit 0'
-                bat 'docker run -d --name hobbies -p 3000:3000 %DOCKER_USER%/hobbies-app:latest'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat 'docker run -d --name hobbies -p 3000:3000 %DOCKER_USER%/hobbies-app:latest'
+                }
             }
         }
     }
