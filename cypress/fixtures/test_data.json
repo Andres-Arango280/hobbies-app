@@ -1,0 +1,30 @@
+{
+  "validUser": {
+    "username": "testuser_cypress",
+    "email": "cypress@hobbiesapp.com",
+    "password": "CypressTest123!"
+  },
+  "invalidUser": {
+    "email": "noexiste@test.com",
+    "password": "wrongpassword"
+  },
+  "xssPayloads": [
+    "<script>alert('xss')</script>",
+    "<img src=x onerror=alert(1)>",
+    "javascript:alert(1)",
+    "<svg/onload=alert(1)>"
+  ],
+  "nosqlPayloads": [
+    { "$gt": "" },
+    { "$where": "1==1" },
+    { "$regex": ".*" }
+  ],
+  "validHobby": {
+    "name": "Fotografía",
+    "description": "Capturar momentos únicos con la cámara"
+  },
+  "invalidHobby": {
+    "name": "",
+    "description": ""
+  }
+}

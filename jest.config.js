@@ -4,5 +4,8 @@ module.exports = {
   testTimeout: 60000,
   forceExit: true,
   detectOpenHandles: true,
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js']
+  setupFilesAfterEnv: [
+    '<rootDir>/tests/setup.js',
+    'jest-extended/all'
+  ]
 };
